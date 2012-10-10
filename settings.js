@@ -1,0 +1,72 @@
+var Settings = Class.extend ({
+	controller: undefined,
+	suspects: [],
+	init: function(controller) {
+		this.controller = controller;
+	},
+	showConfig: function () {
+		console.log("show/hide config...");
+		if ($(".config_window").length == 0){
+			$("body"). prepend('<div class="config_window"></div>');
+			var left = (window.innerWidth - 200)/2;
+			var top = (window.innerHeight - 200)/2;
+			$(".config_window").css({	'position': 	'fixed',
+							'background': 	'#CCC',
+							'border': 		'1px solid #ccc',
+							'width': 		'164px',
+							'z-index': 		'100',
+							'left': 		left + 'px',
+							'top':          top + 'px',
+							'padding':       '20px', 
+							'padding-top':       '10px', 
+							});
+
+			//controls
+			$(".config_window").append('<h2>Settings</h2>');
+			$(".config_window").append('<b><input type="checkbox" id="use_advanced_setings" value="advanced">Adwanced</b></br></br>');
+			$("#use_advanced_setings").click(this.actionAdvancedSettings);
+			$(".config_window").append('<b>Github user</b></br>');
+			$(".config_window").append('<b><input type="text" id="github_user"></b></br>');
+			$(".config_window").append('<b>Github password</b></br>');
+			$(".config_window").append('<b><input type="password" id="github_pwd"></b></br>');
+			$(".config_window").append('<button id="config_save_settings">Save</button>');
+			$("#config_save_settings").click(this.actionSave);
+			$(".config_window").append('<button id="config_cancel_settings">cancel</button>');
+			$("#config_cancel_settings").click(this.actionCancel);
+			this.loadState();
+		}else{
+			$(".config_window").remove();
+		}
+		return $(".config_window");
+	},
+	actionAdvancedSettings: function () {
+		if ($("#use_advanced_setings").attr('checked')){
+			$("#github_user").attr('disabled', 'disabled');
+			$("#github_pwd").attr('disabled', 'disabled');
+		} else {
+			$("#github_user").removeAttr('disabled');
+			$("#github_pwd").removeAttr('disabled');
+		}
+	},
+	actionSave: function () {
+		console.log("saving...");
+		localStorage.setItem("github_user", $("#github_user").val());
+		localStorage.setItem("github_pwd", $("#github_pwd").val());
+		localStorage.setItem("use_advanced_setings", ($("#use_advanced_setings").attr('checked') == 'checked'));
+		showConfig();
+	},
+	actionCancel: function () {
+		console.log("canceling...");
+		showConfig();
+	},
+	loadState: function () {
+		console.log("loading...");
+		if (localStorage.getItem("use_advanced_setings")) {
+			$("#use_advanced_setings").attr('checked', 'checked');
+			$("#github_user").val(localStorage.getItem("github_user"));
+			$("#github_pwd").val(localStorage.getItem("github_pwd"));
+		} else {
+			$("#use_advanced_setings").removeAttr('checked');
+		}
+	}
+});

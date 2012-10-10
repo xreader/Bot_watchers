@@ -1,0 +1,31 @@
+{
+  "name": "Bot watchers",
+  "description": "Distributed system to protect the commenters from bots",
+  "version": "0.1",
+  "manifest_version": 2,
+  "background": { "scripts": ["background.js"] },
+  "permissions": [
+    "storage", "tabs", "http://*.livejournal.com/*",  "https://*/*"
+  ],
+  "icons": { "16": "images/icon-16.jpg", "128": "images/icon-128.jpg" },
+  "browser_action": {
+    "default_icon": "images/icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*.livejournal.com/*"],
+      "js": [
+          "lib/underscore-min.js", 
+      		"lib/base64.js", 
+      		"lib/github.js", 
+      		"lib/jquery-1.8.2.min.js", 
+          "lib/class.js",
+          "remote/repository.js",
+          "handler/abstractsitehandler.js",
+          "handler/ljsitehandler.js",
+          "settings.js",
+      		"content_script.js"
+          ]
+    }
+  ]
+}
