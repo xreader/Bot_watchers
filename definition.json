@@ -4,6 +4,7 @@
 	"definitions":[
 			{
 				"name":"sampleindex",
+				"author":"xreader",
 				"indextype":"github",
 				"description":"пример индекса! использовать только для тестирования",
 				"repository":"Bot_watchers"

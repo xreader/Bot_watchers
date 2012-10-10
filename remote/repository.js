@@ -1,6 +1,7 @@
-function RemoteRpository (controller, repository) {
+function RemoteRpository (controller, repository, owner) {
 
 	this.controller = controller;
+	this.owner = owner;
 	this.repository = repository;
 	this.github = undefined;
 	this.repo = undefined;
@@ -69,6 +70,15 @@ function RemoteRpository (controller, repository) {
 				ref.setBotIndex(botindex);
 				successCallBack();
 			}
+		});
+	};
+
+	this.loadDefinition = function (successCallBack, errorCallBack) {
+		$.getJSON('https://raw.github.com/' + this.owner + '/' + this.repository + '/master/definition.json', function(data) {
+			console.log("loaded definition:" + JSON.stringify(data));
+			sucessCallBack(data);
+		}).error(function (jqXHR, textStatus, errorThrown) {
+			errorCallBack(errorThrown);
 		});
 	};
 

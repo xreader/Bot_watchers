@@ -91,14 +91,14 @@ function loadIndex() {
 			}, this);
 		});
 	} else {
-		getRepository(selectedIndex).read(onBotIndexUpdated, errorHandler);
+		getRepository(selectedIndex).loadDefinition(onBotIndexUpdated, errorHandler);
 	}
 }
 
-function getRepository(selectedIndex) {
-	if (repository == undefined || repository.repository != selectedIndex.repository){
-		if (selectedIndex.indextype == 'github'){
-			repository = new RemoteRpository(this, selectedIndex.repository)
+function getRepository(definition) {
+	if (repository == undefined || repository.repository != definition.repository){
+		if (definition.indextype == 'github'){
+			repository = new RemoteRpository(this, definition.repository, definition.author)
 		}
 	}
 	return repository;
