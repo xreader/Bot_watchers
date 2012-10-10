@@ -2,6 +2,11 @@
 	"version":"0.1",
 	"default": "sampleindex",
 	"definitions":[
-		{"name":"sampleindex", "indextype":"github", "description":"пример индекса! использовать только для тестирования","url":"Bot_watchers"}
+			{
+				"name":"sampleindex",
+				"indextype":"github",
+				"description":"пример индекса! использовать только для тестирования",
+				"repository":"Bot_watchers"
+			}
 		]
 }

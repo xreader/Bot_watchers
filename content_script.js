@@ -96,9 +96,9 @@ function loadIndex() {
 }
 
 function getRepository(selectedIndex) {
-	if (repository == undefined || repository.repository != selectedIndex.url){
+	if (repository == undefined || repository.repository != selectedIndex.repository){
 		if (selectedIndex.indextype == 'github'){
-			repository = new RemoteRpository(this, selectedIndex.url)
+			repository = new RemoteRpository(this, selectedIndex.repository)
 		}
 	}
 	return repository;
