@@ -1,15 +1,9 @@
-var RemoteRpository = function () {
+function RemoteRpository (controller, repository) {
 
-	this.controller = undefined;
-	this.repository = undefined;
+	this.controller = controller;
+	this.repository = repository;
 	this.github = undefined;
 	this.repo = undefined;
-
-	this.RemoteRpository = function (controller, repository) {
-		this.controller = controller;
-		this.repository = repository;
-	}
-
 	this.remoteIndex = 'botindex.txt';
 
 	this.getGitHub = function () {

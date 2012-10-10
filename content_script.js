@@ -27,8 +27,8 @@ function checkUser (index) {
 	return true;
 }
 
-function errorHandler () {
-	console.log("Error handler:" + args);
+function errorHandler (err) {
+	console.log("Error handler:" + err);
 }
 
 function markAsBot () {
@@ -78,31 +78,30 @@ function loadIndex() {
 	console.log("processing comments...");
 	window.clearInterval(intervalId);
 
-	var selectedIndex = localStorage.getItem("selected_index");
+	var selectedIndex = undefined; //JSON.parse(localStorage.getItem("selected_index"));
 	if (selectedIndex == undefined){
-		$.getJSON('https://raw.github.com/xreader/bot-watcher-index/master/definition.json', function(data) {
+		$.getJSON('https://raw.github.com/xreader/Bot_watchers/master/definition.json', function(data) {
 			console.log("loaded definition:" + JSON.stringify(data));
 			var defaultIndex = data.default;
 			_.each(data.definitions, function(definition) {
-				if (definition.name = dafaultIndex){
+				if (definition.name = defaultIndex){
 					localStorage.setItem("selected_index", JSON.stringify(definition));
-					break;
+					getRepository(definition).read(onBotIndexUpdated, errorHandler);
 				}
 			}, this);
 		});
 	} else {
-		if (selectedIndex.indextype == 'github'){
-			repository = new RemoteRpository(this, selectedIndex.url)
-		}
-		repository.read(onBotIndexUpdated, errorHandler);
+		getRepository(selectedIndex).read(onBotIndexUpdated, errorHandler);
 	}
 }
 
 function getRepository(selectedIndex) {
-	if (repository == undefined || repository.repository != selectedIndex.url)
-	if (selectedIndex.indextype == 'github'){
-		repository = new RemoteRpository(this, selectedIndex.url)
+	if (repository == undefined || repository.repository != selectedIndex.url){
+		if (selectedIndex.indextype == 'github'){
+			repository = new RemoteRpository(this, selectedIndex.url)
+		}
 	}
+	return repository;
 }
 
 function showConfig() {
