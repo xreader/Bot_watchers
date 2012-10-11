@@ -30,5 +30,6 @@
  "http://nucon.livejournal.com/",
  "http://dyadka-valerka.livejournal.com/",
  "http://purup.livejournal.com/",
- "http://a-volna.livejournal.com/"
+ "http://a-volna.livejournal.com/",
+ "http://neiswestnij.livejournal.com/"
 ]
