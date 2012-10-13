@@ -7,6 +7,7 @@ var AbstractSiteHandler = Class.extend ({
 		this.controller = controller;
 		this.addControl("action_reload_index", "⟳Reload", this, this.reloadIndex);
 		this.addControl("action_config", "⟁Config", this, controller.showConfig);
+		this.addControl("action_select_definition", "⏚Все списки", this, controller.showDefinitionSelector);
 	},
 	reloadIndex: function () {
 		this.controller.loadIndex();

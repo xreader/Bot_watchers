@@ -9,8 +9,7 @@ var intervalId = window.setInterval(function() {
 	console.log("loaded comments:" + list.length);
 	if (list.length > 1){
 		siteHandler = new LJSiteHandler(this);
-		//buildControlBar();
-		loadIndex();
+		onCommentsLoaded();
 	}
 }, 2000);
 
@@ -19,8 +18,6 @@ var intervalId = window.setInterval(function() {
 * @return false if user is compromised, true if not
 */
 function checkUser (index) {
-	//console.log("user?" + index + " >" + $(this).attr("href"));
-	//TODO check if user in bot definition file ()
 	if (repository.getBotIndex()){
 		return (_.contains(repository.getBotIndex(), $(this).attr("href")));
 	}
@@ -70,23 +67,31 @@ function addBotToRepoBatch (profiles) {
 	}
 }
 
+function onCommentsLoaded () {
+	window.clearInterval(intervalId);
+	if (!settings.isConfigured()){
+		settings.showConfig(function () {
+			console.log("config window closed");
+		});
+	}
+	loadIndex();	
+}
 /**
 * parses the comments tree and checks it against the bot definition file
 *
 */
 function loadIndex() {
 	console.log("processing comments...");
-	window.clearInterval(intervalId);
 
 	var selectedIndex = undefined; //JSON.parse(localStorage.getItem("selected_index"));
-	if (selectedIndex == undefined){
+	if (selectedIndex == undefined) {
 		$.getJSON('https://raw.github.com/xreader/Bot_watchers/master/definition.json', function(data) {
 			console.log("loaded definition:" + JSON.stringify(data));
 			var defaultIndex = data.default;
 			_.each(data.definitions, function(definition) {
 				if (definition.name = defaultIndex){
 					localStorage.setItem("selected_index", JSON.stringify(definition));
-					getRepository(definition).read(onBotIndexUpdated, errorHandler);
+					getRepository(definition).loadDefinition(onBotIndexUpdated, errorHandler);
 				}
 			}, this);
 		});
@@ -108,7 +113,41 @@ function showConfig() {
 	settings.showConfig();
 }
 
+function showDefinitionSelector () {
+	$.getJSON('https://raw.github.com/xreader/Bot_watchers/master/definition.json', function(data) {
+			console.log("loaded definition:" + JSON.stringify(data));
+
+			//create popup
+			var popup = new JSPopUp("definition_selector", null, null, 600);	
+			popup.create("<h2>Список доступных индексов</h2>");
+			popup.append('<select id="list_avalaible_indexes" size="10"></select></br>');
+
+			var selectedIndex = JSON.parse(localStorage.getItem("selected_index"));
+			var defaultIndex = data.default;
+			if (selectedIndex != undefined){
+				defaultIndex = selectedIndex.name;
+			}
+			var defaultIndex = data.default;
+			_.each(data.definitions, function(definition) {
+				$("#list_avalaible_indexes").append('<option value="' 
+					+ definition.name + '" ' + (definition.name == defaultIndex?'selected="selected"':"") + '">' 
+					+ definition.name 
+					+ ' by(' + definition.author + ' ) '
+					+ definition.description
+					+ '</option>');
+			}, this);
+			popup.append('<button id="action_select_definition">Save</button>');
+			$("#action_select_definition").click( function () {
+				var selectedIndex = $("#list_avalaible_indexes").val();
+				console.log ("selected definition:" + selectedIndex);
+				popup.hide();
+			});
+	});	
+
+}
+
 function onBotIndexUpdated () {
+	console.log("index updated...");
 	var list = $('a[class="i-ljuser-username"]');
 	siteHandler.suspects = [];
 	siteHandler.selectionChanged();

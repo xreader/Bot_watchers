@@ -74,9 +74,13 @@ function RemoteRpository (controller, repository, owner) {
 	};
 
 	this.loadDefinition = function (successCallBack, errorCallBack) {
-		$.getJSON('https://raw.github.com/' + this.owner + '/' + this.repository + '/master/definition.json', function(data) {
+		var url = 'https://raw.github.com/' + this.owner + '/' + this.repository + '/master/' + this.remoteIndex;
+		console.log("loading definition from:" + url);
+		var ref = this;
+		$.getJSON(url, function(data) {
 			console.log("loaded definition:" + JSON.stringify(data));
-			sucessCallBack(data);
+			ref.setBotIndex(data);
+			successCallBack(data);
 		}).error(function (jqXHR, textStatus, errorThrown) {
 			errorCallBack(errorThrown);
 		});
@@ -84,18 +88,12 @@ function RemoteRpository (controller, repository, owner) {
 
 	this.save = function (successCallBack, errorCallBack) {
 		var message = 'saving index ...';
-		this.getRepo().write('master', this.remoteIndex, JSON.stringify(this.getBotIndex()), message, function(err) {
+		this.getRepo().write('master', this.remoteIndex, JSON.stringify(this.getBotIndex(), null, " "), message, function(err) {
 			if (err != null){
 				errorCallBack(err);
 			}else{
 				successCallBack();	
 			}
-		});
-	};
-
-	this.getDefinitions = function () {
-		$.getJSON('https://raw.github.com/xreader/bot-watcher-index/master/definition.json', function(data) {
-			return JSON.parse(data);
 		});
 	};
 }

@@ -23,6 +23,7 @@
           "remote/repository.js",
           "handler/abstractsitehandler.js",
           "handler/ljsitehandler.js",
+          "jspopup.js",
           "settings.js",
       		"content_script.js"
           ]

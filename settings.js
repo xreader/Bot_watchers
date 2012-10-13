@@ -4,12 +4,13 @@ var Settings = Class.extend ({
 	init: function(controller) {
 		this.controller = controller;
 	},
-	showConfig: function () {
+	showConfig: function (callback) {
 		console.log("show/hide config...");
 		if ($(".config_window").length == 0){
-			$("body"). prepend('<div class="config_window"></div>');
+			$("body").prepend('<div class="config_window"></div>');
 			var left = (window.innerWidth - 200)/2;
 			var top = (window.innerHeight - 200)/2;
+			var ref = this;
 			$(".config_window").css({	'position': 	'fixed',
 							'background': 	'#CCC',
 							'border': 		'1px solid #ccc',
@@ -30,9 +31,15 @@ var Settings = Class.extend ({
 			$(".config_window").append('<b>Github password</b></br>');
 			$(".config_window").append('<b><input type="password" id="github_pwd"></b></br>');
 			$(".config_window").append('<button id="config_save_settings">Save</button>');
-			$("#config_save_settings").click(this.actionSave);
+			$("#config_save_settings").click(function() {
+				ref.actionSave ();
+				if (callback != undefined) callback();
+			});
 			$(".config_window").append('<button id="config_cancel_settings">cancel</button>');
-			$("#config_cancel_settings").click(this.actionCancel);
+			$("#config_cancel_settings").click(function () {
+				ref.actionCancel();
+				if (callback != undefined) callback();
+			});
 			this.loadState();
 		}else{
 			$(".config_window").remove();
@@ -49,18 +56,18 @@ var Settings = Class.extend ({
 		}
 	},
 	actionSave: function () {
-		console.log("saving...");
+		console.log("saving settings...");
 		localStorage.setItem("github_user", $("#github_user").val());
 		localStorage.setItem("github_pwd", $("#github_pwd").val());
 		localStorage.setItem("use_advanced_setings", ($("#use_advanced_setings").attr('checked') == 'checked'));
 		showConfig();
 	},
 	actionCancel: function () {
-		console.log("canceling...");
+		console.log("canceling settings...");
 		showConfig();
 	},
 	loadState: function () {
-		console.log("loading...");
+		console.log("loading settings...");
 		if (localStorage.getItem("use_advanced_setings")) {
 			$("#use_advanced_setings").attr('checked', 'checked');
 			$("#github_user").val(localStorage.getItem("github_user"));
@@ -68,5 +75,8 @@ var Settings = Class.extend ({
 		} else {
 			$("#use_advanced_setings").removeAttr('checked');
 		}
+	},
+	isConfigured: function () {
+		return (localStorage.getItem("use_advanced_setings") != null) && (localStorage.getItem("use_advanced_setings") != "null");
 	}
 });
