@@ -18,14 +18,19 @@ var intervalId = window.setInterval(function() {
 * @return false if user is compromised, true if not
 */
 function checkUser (index) {
-	if (repository.getBotIndex()){
-		return (_.contains(repository.getBotIndex(), $(this).attr("href")));
+	if (getBotIndex()){
+		return (_.contains(getBotIndex(), $(this).attr("href")));
 	}
 	return true;
 }
 
 function errorHandler (err) {
-	console.log("Error handler:" + err);
+	console.log("Error handler:" + err.request.responseText);
+	if (err.error = 401){
+		showConfig(function () {
+			repository = undefined;
+		});
+	}
 }
 
 function markAsBot () {
@@ -41,16 +46,16 @@ function unmarkAsNot () {
 }
 
 function addBotToRepo (profile) {
-	if(repository.add(profile)){
-		repository.save(function () {
+	if(getRepository().add(profile)){
+		getRepository().save(function () {
 			onBotIndexUpdated();
 		}, errorHandler);
 	}
 }
 
 function removeBotFromRepo (profile) {
-	if(repository.remove(profile)) {
-		repository.save(function () {
+	if(getRepository().remove(profile)) {
+		getRepository().save(function () {
 			onBotIndexUpdated();
 		}, errorHandler);
 	}
@@ -59,9 +64,9 @@ function removeBotFromRepo (profile) {
 function addBotToRepoBatch (profiles) {
 	if (profiles.length > 0){
 		_.each(profiles, function (profile) {
-			repository.add(profile);
+			getRepository().add(profile);
 		}, this);
-		repository.save(function () {
+		getRepository().save(function () {
 			onBotIndexUpdated();
 		}, errorHandler);
 	}
@@ -85,23 +90,23 @@ function loadIndex() {
 
 	var selectedIndex = undefined; //JSON.parse(localStorage.getItem("selected_index"));
 	if (selectedIndex == undefined) {
-		$.getJSON('https://raw.github.com/xreader/Bot_watchers/master/definition.json', function(data) {
+		$.getJSON('https://raw.github.com/xreader/bot-watchers-indexes/master/definition.json', function(data) {
 			console.log("loaded definition:" + JSON.stringify(data));
 			var defaultIndex = data.default;
 			_.each(data.definitions, function(definition) {
 				if (definition.name = defaultIndex){
 					localStorage.setItem("selected_index", JSON.stringify(definition));
-					getRepository(definition).loadDefinition(onBotIndexUpdated, errorHandler);
+					loadDefinition(definition.author, definition.repository, onBotIndexUpdated, errorHandler);
 				}
 			}, this);
 		});
 	} else {
-		getRepository(selectedIndex).loadDefinition(onBotIndexUpdated, errorHandler);
+		loadDefinition(selectedIndex.author, selectedIndex.repository, onBotIndexUpdated, errorHandler);
 	}
 }
 
-function getRepository(definition) {
-	if (repository == undefined || repository.repository != definition.repository){
+function getRepository() {
+	if (repository == undefined){
 		if (definition.indextype == 'github'){
 			repository = new RemoteRpository(this, definition.repository, definition.author)
 		}
@@ -114,7 +119,7 @@ function showConfig() {
 }
 
 function showDefinitionSelector () {
-	$.getJSON('https://raw.github.com/xreader/Bot_watchers/master/definition.json', function(data) {
+	$.getJSON('https://raw.github.com/xreader/bot-watchers-indexes/master/definition.json', function(data) {
 			console.log("loaded definition:" + JSON.stringify(data));
 
 			//create popup
@@ -146,6 +151,19 @@ function showDefinitionSelector () {
 
 }
 
+function loadDefinition (owner, repository, successCallBack, errorCallBack) {
+		var url = 'https://raw.github.com/' + owner + '/' + repository + '/master/botindex.txt';
+		console.log("loading definition from:" + url);
+		var ref = this;
+		$.getJSON(url, function(data) {
+			console.log("loaded definition:" + JSON.stringify(data));
+			ref.setBotIndex(data);
+			successCallBack(data);
+		}).error(function (jqXHR, textStatus, errorThrown) {
+			errorCallBack(errorThrown);
+		});
+};
+
 function onBotIndexUpdated () {
 	console.log("index updated...");
 	var list = $('a[class="i-ljuser-username"]');
@@ -167,4 +185,12 @@ function onBotIndexUpdated () {
 	$('.unmark_as_bot').click(unmarkAsNot);
 	console.log("DONE!");
 }
+
+function getBotIndex () {
+		return this.botindex;
+	};
+
+function setBotIndex (botindex) {
+		this.botindex = botindex;
+	};
 

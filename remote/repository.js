@@ -1,8 +1,7 @@
-function RemoteRpository (controller, repository, owner) {
+function RemoteRpository (controller) {
 
 	this.controller = controller;
-	this.owner = owner;
-	this.repository = repository;
+	this.repository = "bot-watcher-index";
 	this.github = undefined;
 	this.repo = undefined;
 	this.remoteIndex = 'botindex.txt';
@@ -10,8 +9,8 @@ function RemoteRpository (controller, repository, owner) {
 	this.getGitHub = function () {
 		if (this.github == undefined) {
 			this.github = new Github({
-			  username: "xreader",
-			  password: "demogen22",
+			  username: localStorage.getItem("github_user"),
+			  password: localStorage.getItem("github_pwd"),
 			  auth: "basic"
 			});
 		}
@@ -21,12 +20,12 @@ function RemoteRpository (controller, repository, owner) {
 	this.getRepo = function () {
 		this.getGitHub();
 		if (this.repo == undefined){
-			this.repo =this.getGitHub().getRepo("xreader", this.repository);
+			this.repo =this.getGitHub().getRepo(localStorage.getItem("github_user"), this.repository);
 		}
 		return this.repo;
 	};
 
-
+/*
 	this.getBotIndex = function () {
 		return this.botindex;
 	};
@@ -34,26 +33,26 @@ function RemoteRpository (controller, repository, owner) {
 	this.setBotIndex = function (botindex) {
 		this.botindex = botindex;
 	};
-
+*/
 	this.remove = function (profileUrl) {
-		var botindex = this.getBotIndex();
+		var botindex = controller.getBotIndex();
 		var idx = botindex.indexOf(profileUrl);
 		if (idx >= 0){
 			botindex.splice(idx, 1);
-			this.setBotIndex(botindex);
+			controller.setBotIndex(botindex);
 			return true;
 		}
 		return false;
 	};
 
 	this.add = function (profileUrl) {
-		var botindex = this.getBotIndex();
+		var botindex = controller.getBotIndex();
 		if (botindex == undefined){
 			botindex = [];
 		}
 		if (!_.contains(botindex, profileUrl)){
 			botindex.push(profileUrl);
-			this.setBotIndex(botindex);
+			controller.setBotIndex(botindex);
 		}
 		return true;
 	};
@@ -67,28 +66,15 @@ function RemoteRpository (controller, repository, owner) {
 			} else {
 				console.log("File content:" + data);
 				var botindex = JSON.parse(data);
-				ref.setBotIndex(botindex);
+				ref.controller.setBotIndex(botindex);
 				successCallBack();
 			}
 		});
 	};
 
-	this.loadDefinition = function (successCallBack, errorCallBack) {
-		var url = 'https://raw.github.com/' + this.owner + '/' + this.repository + '/master/' + this.remoteIndex;
-		console.log("loading definition from:" + url);
-		var ref = this;
-		$.getJSON(url, function(data) {
-			console.log("loaded definition:" + JSON.stringify(data));
-			ref.setBotIndex(data);
-			successCallBack(data);
-		}).error(function (jqXHR, textStatus, errorThrown) {
-			errorCallBack(errorThrown);
-		});
-	};
-
 	this.save = function (successCallBack, errorCallBack) {
 		var message = 'saving index ...';
-		this.getRepo().write('master', this.remoteIndex, JSON.stringify(this.getBotIndex(), null, " "), message, function(err) {
+		this.getRepo().write('master', this.remoteIndex, JSON.stringify(controller.getBotIndex(), null, " "), message, function(err) {
 			if (err != null){
 				errorCallBack(err);
 			}else{

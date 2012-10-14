@@ -1,6 +1,9 @@
 var Settings = Class.extend ({
 	controller: undefined,
 	suspects: [],
+	//FIXME implemented method let save the settings just for one URL
+	//TODO to save the settings global one have to use this approach
+	//http://stackoverflow.com/questions/12284952/access-extension-data-on-other-pages
 	init: function(controller) {
 		this.controller = controller;
 	},
@@ -78,5 +81,12 @@ var Settings = Class.extend ({
 	},
 	isConfigured: function () {
 		return (localStorage.getItem("use_advanced_setings") != null) && (localStorage.getItem("use_advanced_setings") != "null");
+	},
+	getUser: function () {
+		localStorage.getItem("github_user");	
+	},
+	getPwd: function () {
+		localStorage.getItem("github_pwd");	
 	}
+
 });
