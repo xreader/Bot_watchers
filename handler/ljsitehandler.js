@@ -8,7 +8,7 @@ var LJSiteHandler = AbstractSiteHandler.extend({
 		this.addControl("action_quick_comments_60", "☃𝌆 60 sec", this, this.filterTooQuickCommentes, 60);
 		this.addControl("action_quick_comments_sum_30", "∑☃𝌆 30 sec", this, this.filterTooQuickCommentesSum, 30);
 		this.addControl("action_quick_comments_sum_60", "∑☃𝌆 60 sec", this, this.filterTooQuickCommentesSum, 60);
-		this.addControl("action_save_selected", "⬆Save", this, this.saveChanges);
+		//this.addControl("action_save_selected", "⬆Save", this, this.saveChanges);
 	},
 	selectionChanged: function () {
 		$("#action_save_selected").text("⬆Save " + ((this.suspects.length>0)?this.suspects.length:""));
